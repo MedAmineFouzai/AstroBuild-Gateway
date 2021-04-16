@@ -1,5 +1,5 @@
 [package]
-name = "actix_graph_qlfiles_server"
+name = "gql_gateway_server"
 version = "0.1.0"
 authors = ["MedAmineFouzai <54685665+MedAmineFouzai@users.noreply.github.com>"]
 edition = "2018"
