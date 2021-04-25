@@ -1,10 +1,30 @@
-use async_graphql::{InputObject,SimpleObject};
+use async_graphql::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, SimpleObject, Deserialize)]
 pub struct UserId {
     pub id: String,
 }
+
+#[derive(Enum, Copy, Clone, Eq, PartialEq)]
+pub enum Role {
+    #[graphql(name="Admin")]
+    Admin,
+    #[graphql(name="Client")]
+    Client,
+    #[graphql(name="ProductOwner")]
+    ProductOwner,
+    #[graphql(name="Developer")]
+    Developer,
+
+}
+
+#[derive(Debug, Serialize, SimpleObject, Deserialize)]
+pub struct DeleteUserById {
+    pub id: String,
+    pub password:String
+}
+
 #[derive(Debug, Serialize, SimpleObject, Deserialize, Clone)]
 pub struct PhoneModel {
     pub prefix: String,
@@ -78,18 +98,6 @@ pub struct UserInfo {
     pub address: AddressModel,
 }
 
-// #[derive(Debug,Serialize, Deserialize, Clone)]
-// pub enum UpdateObject {
-//     UpdateUserInfo {
-//         id: String,
-//         user_info: UserInfo,
-//     },
-//     UpdatePassword {
-//         id: String,
-//         set_password: PasswordModel,
-//     },
-// }
-
 #[derive(Debug, SimpleObject, Serialize, Deserialize)]
 pub struct UpdateUserInfo {
     pub id: String,
@@ -117,4 +125,28 @@ pub struct EmailModel {
 pub struct AuthResponseModel {
     pub user: UserResponseModel,
     pub token: String,
+}
+
+/////////////////////////////////// Category model 
+
+#[derive(Debug,SimpleObject, Serialize, Deserialize)]
+pub struct Category {
+    pub name: String,
+    pub description: String,
+    pub image: File,
+}
+
+
+#[derive(Debug,SimpleObject, Serialize, Deserialize)]
+pub struct CategoryResponseModel {
+    pub id:String,
+    pub name: String,
+    pub description: String,
+    pub image: File,
+}
+
+#[derive(Debug,SimpleObject, Clone, Serialize, Deserialize)]
+pub struct File {
+    pub name: String,
+    pub src: String,
 }

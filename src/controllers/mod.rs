@@ -1,20 +1,36 @@
+extern crate hyper_multipart_rfc7578 ;
+use hyper::{Client, Request};
+use hyper_multipart_rfc7578::client::{self, multipart};
 use actix_web::{get, http::StatusCode, HttpRequest, HttpResponse};
 use async_graphql::ErrorExtensions;
-use async_graphql::{Context, EmptySubscription, FieldResult, Object, Schema, Upload};
-use reqwest::header;
+use async_graphql::*;
+use reqwest::{header};
 use std::env;
 use crate::middleware::error::UserCustomResponseError;
 use serde_json::json;
+use std::iter::FromIterator;
+use std::io::Read;
+
 mod schema;
 use schema::{
     AddressModel, AuthResponseModel, PasswordModel, PhoneModel, UpdateUserInfo, UpdateUserPassword,EmailModel,
-    UserId, UserInfo, UserLoginModel, UserModel, UserResponseModel,AddressInputModel,PhoneInputModel,PasswordInputModel
+    UserId, UserInfo, UserLoginModel, UserModel, UserResponseModel,AddressInputModel,PhoneInputModel,PasswordInputModel,DeleteUserById,
+    Category, CategoryResponseModel,File,Role
+
 };
 
+
+
 use load_dotenv::load_dotenv;
+
+use self::schema::{};
 load_dotenv!();
 #[derive(Debug)]
 pub struct MyToken(pub String);
+
+
+
+
 
 pub type UserSchema = Schema<QueryRoot, MutationRoot, EmptySubscription>;
 
@@ -136,7 +152,7 @@ impl MutationRoot {
         phone:PhoneInputModel,
         address:AddressInputModel,
         active: bool,
-        role: String,
+        role: Role,
     ) -> FieldResult<AuthResponseModel> {
         let client = reqwest::Client::new();
         let res = client
@@ -157,7 +173,12 @@ impl MutationRoot {
                     country: address.country,
                 },
                 active: active,
-                role: role,
+                role: match role {
+                    Role::Admin => "Admin".to_string(),
+                    Role::Client => "Client".to_string(),
+                    Role::ProductOwner =>"ProductOwner".to_string(),
+                    Role::Developer => "Developer".to_string(),
+                }
             })
             .send()
             .await
@@ -167,8 +188,10 @@ impl MutationRoot {
             StatusCode::OK => {
                 let user: AuthResponseModel = res.json::<AuthResponseModel>().await.unwrap();
                 Ok(user)
-            }
-
+            },
+            StatusCode::CONFLICT => Err(UserCustomResponseError::NotFound
+                .extend_with(|_, e| e.set("info", "User Already Exist !"))),
+            
             StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
                 .extend_with(|_, e| e.set("info", "Bad Credentials Or User Dosent Existe !"))),
 
@@ -203,7 +226,7 @@ impl MutationRoot {
         }
     }
 
-    async fn delete_user(&self, ctx: &Context<'_>, id: String) -> FieldResult<UserResponseModel> {
+    async fn delete_user(&self, ctx: &Context<'_>, id: String,password:String) -> FieldResult<UserResponseModel> {
         let mut headers = header::HeaderMap::new();
         headers.insert(
             header::AUTHORIZATION,
@@ -218,7 +241,7 @@ impl MutationRoot {
             .default_headers(headers)
             .build()
             .unwrap();
-        let data: UserId = UserId { id: id };
+        let data: DeleteUserById = DeleteUserById { id: id ,password:password};
         let res = client
             .delete(&format!("{}/api/v1/users/delete",env!("BASE_URL")))
             .json(&data)
@@ -427,5 +450,96 @@ impl MutationRoot {
                 .extend_with(|_, e| e.set("info", "Somthing Wrong Happend ! "))),
         }
     }
+
+    //Categoru Mutations 
+    
+//     async fn add_category(&self, ctx: &Context<'_>, name: String, description: String
+// //    ,image:Upload
+// ) -> FieldResult<CategoryResponseModel> {
+//         let mut headers = header::HeaderMap::new();
+//         headers.insert(
+//             header::AUTHORIZATION,
+//             header::HeaderValue::from_str(
+//                 &ctx.data_opt::<MyToken>()
+//                     .map(|token| token.0.as_str())
+//                     .unwrap(),
+//             )
+//             .unwrap(),
+//         );
+//         // let files=image.value(ctx).unwrap();
+//         let mut form = multipart::Form::default();
+//         form.add_text("name", name);
+//         form.add_text("description", description);
+//         form.add_file("image",file!()).expect("file to exist");
+//         let mut req_builder = Request::post(&format!("{}/api/v1/builder/category/add",env!("BASE_URL")));
+//         let req = form.set_body::<multipart::Body>(req_builder).unwrap();
+
+//         if let Ok(_) = Client::builder().build_http().request(req).await{
+//             println!("done...");
+//             } else {
+//             eprintln!("an error occurred");
+//             };
+         
+       
+        
+        
+        
+//         // let form=multipart::Form::new()
+//         // .text("name", name)
+//         // .text("description", description);
+      
+//         // let file = File::open("cargo.toml")?;
+
+//         // let client = reqwest::Client::builder()
+//         //     .default_headers(headers)
+//         //     .build()
+//         //     .unwrap();
+//         // let res=client.post(&format!("{}/api/v1/builder/category/add",env!("BASE_URL")))
+//         // .
+        
+//         // body(file)
+//         // .send().await.unwrap();
+//         // println!("res: {:?}",res);
+//         // // let data = ;
+//         // let res = client
+//         //     .put(&format!("{}/api/v1/users/update/password",env!("BASE_URL")))
+//         //     .json(&UpdateUserPassword {
+//         //         id: id,
+//         //         set_password: PasswordModel { old_password: password.old_password, new_password: password.new_password},
+//         //     })
+//         //     .send()
+//         //     .await
+//         //     .unwrap();
+//         // match res.status() {
+//         //     StatusCode::OK => {
+//         //         let user: UserResponseModel = res.json::<UserResponseModel>().await.unwrap();
+//         //         Ok(user)
+//         //     }
+
+//         //     StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+//         //         .extend_with(|_, e| e.set("info", "User Dosent Existe To Update info !"))),
+//         //     StatusCode::FORBIDDEN => {
+//         //         Err(UserCustomResponseError::NotAllowed.extend_with(|_, e| {
+//         //             e.set("info", "User not ALLowed or Bad Authorization header !")
+//         //         }))
+//         //     }
+//         //     _ => Err(UserCustomResponseError::ServerError
+//         //         .extend_with(|_, e| e.set("info", "Somthing Wrong Happend ! "))),
+//         // }
+//        Ok( CategoryResponseModel{
+//             id: "sdqd".to_string(),
+//             name: "qsdqsd".to_string(),
+//             description: "qsdsqd".to_string(),
+//             image: File{
+//                 name:"sqdqsd".to_string(),
+//                 src:"sqdqsd".to_string()
+//             },
+            
+//         })
+
+//     }
+
+
+
 
 }

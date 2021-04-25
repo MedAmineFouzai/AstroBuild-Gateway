@@ -16,12 +16,36 @@ pub enum UserCustomResponseError {
     NotAllowed,
 }
 
+#[derive(Debug, Error)]
+pub enum CategoryCustomResponseError {
+    #[error("Could not find resource")]
+    NotFound,
+
+    #[error("Server Error")]
+    ServerError,
+
+    #[error("Not Allowed")]
+    NotAllowed,
+}
+
+
 impl ErrorExtensions for UserCustomResponseError {
     fn extend(&self) -> Error {
         Error::new(format!("{}", self)).extend_with(|_err, e| match self {
             UserCustomResponseError::NotFound => e.set("code", "NOT_FOUND"),
             UserCustomResponseError::ServerError => e.set("code", "Internal_Server_Error"),
             UserCustomResponseError::NotAllowed => e.set("code", "Not_Allowed"),
+        })
+    }
+}
+
+
+impl ErrorExtensions for CategoryCustomResponseError {
+    fn extend(&self) -> Error {
+        Error::new(format!("{}", self)).extend_with(|_err, e| match self {
+            CategoryCustomResponseError::NotFound => e.set("code", "NOT_FOUND"),
+            CategoryCustomResponseError::ServerError => e.set("code", "Internal_Server_Error"),
+            CategoryCustomResponseError::NotAllowed => e.set("code", "Not_Allowed"),
         })
     }
 }
