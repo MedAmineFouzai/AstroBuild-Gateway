@@ -1,6 +1,3 @@
-extern crate hyper_multipart_rfc7578 ;
-use hyper::{Client, Request};
-use hyper_multipart_rfc7578::client::{self, multipart};
 use actix_web::{get, http::StatusCode, HttpRequest, HttpResponse};
 use async_graphql::ErrorExtensions;
 use async_graphql::*;
