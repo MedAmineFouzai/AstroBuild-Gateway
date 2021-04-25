@@ -3,11 +3,11 @@ mod controllers;
 mod middleware;
 use actix_cors::Cors;
 use actix_web::{guard, middleware as mid, web, App, HttpRequest, HttpResponse, HttpServer};
-
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig, MultipartOptions};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_graphql_actix_web::{Request, Response};
 use controllers::{MutationRoot, MyToken, QueryRoot, UserSchema};
+use std::env;
 
 async fn index(schema: web::Data<UserSchema>, req: HttpRequest, gql_request: Request) -> Response {
     let token = req
@@ -32,7 +32,10 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
-    println!("Playground: http://localhost:8000");
+    println!("Playground: http://localhost:3000");
+    let port:u16= env::var("PORT")
+    .unwrap_or_else(|_| "3000".to_string())
+    .parse().expect("PORT must be a number");
 
     HttpServer::new(move || {
         App::new()
@@ -55,7 +58,7 @@ async fn main() -> std::io::Result<()> {
             // .service(download)
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
-    .bind("127.0.0.1:3000")?
+    .bind(("0.0.0.0".to_string(),port))?
     .run()
     .await
 }
