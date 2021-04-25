@@ -189,7 +189,7 @@ impl MutationRoot {
                 let user: AuthResponseModel = res.json::<AuthResponseModel>().await.unwrap();
                 Ok(user)
             },
-            StatusCode::CONFLICT => Err(UserCustomResponseError::NotFound
+            StatusCode::CONFLICT => Err(UserCustomResponseError::Conflict
                 .extend_with(|_, e| e.set("info", "User Already Exist !"))),
             
             StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
