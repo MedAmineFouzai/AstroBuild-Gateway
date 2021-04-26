@@ -1,3 +1,6 @@
+extern crate hyper_multipart_rfc7578 ;
+use hyper::{Client, Request};
+use hyper_multipart_rfc7578::client::{self, multipart};
 use actix_web::{get, http::StatusCode, HttpRequest, HttpResponse};
 use async_graphql::ErrorExtensions;
 use async_graphql::*;
@@ -42,7 +45,7 @@ impl QueryRoot {
             header::HeaderValue::from_str(
                 &ctx.data_opt::<MyToken>()
                     .map(|token| token.0.as_str())
-                    .unwrap(),
+                    .unwrap_or("Authorization "),
             )
             .unwrap(),
         );
@@ -88,7 +91,7 @@ impl QueryRoot {
             header::HeaderValue::from_str(
                 &ctx.data_opt::<MyToken>()
                     .map(|token| token.0.as_str())
-                    .unwrap(),
+                    .unwrap_or("Authorization "),
             )
             .unwrap(),
         );
@@ -230,7 +233,7 @@ impl MutationRoot {
             header::HeaderValue::from_str(
                 &ctx.data_opt::<MyToken>()
                     .map(|token| token.0.as_str())
-                    .unwrap(),
+                    .unwrap_or("Authorization "),
             )
             .unwrap(),
         );
@@ -278,7 +281,7 @@ impl MutationRoot {
             header::HeaderValue::from_str(
                 &ctx.data_opt::<MyToken>()
                     .map(|token| token.0.as_str())
-                    .unwrap(),
+                    .unwrap_or("Authorization "),
             )
             .unwrap(),
         );
@@ -338,7 +341,7 @@ impl MutationRoot {
             header::HeaderValue::from_str(
                 &ctx.data_opt::<MyToken>()
                     .map(|token| token.0.as_str())
-                    .unwrap(),
+                    .unwrap_or("Authorization "),
             )
             .unwrap(),
         );
@@ -379,7 +382,6 @@ impl MutationRoot {
         ctx: &Context<'_>,
         email:String
     ) -> FieldResult<UserResponseModel> {
-        let mut headers = header::HeaderMap::new();
        
         let client = reqwest::Client::new();
         // let data = ;
@@ -417,7 +419,7 @@ impl MutationRoot {
         id: String,
         password:String
     ) -> FieldResult<UserResponseModel> {
-        let mut headers = header::HeaderMap::new();
+      
        
         let client = reqwest::Client::new();
         // let data = ;
@@ -437,7 +439,7 @@ impl MutationRoot {
             }
 
             StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
-                .extend_with(|_, e| e.set("info", "User Dosent Existe To Update info !"))),
+                .extend_with(|_, e| e.set("info", "User Dosent Existe To Reset Password !"))),
             StatusCode::FORBIDDEN => {
                 Err(UserCustomResponseError::NotAllowed.extend_with(|_, e| {
                     e.set("info", "User not ALLowed or Bad Authorization header !")
