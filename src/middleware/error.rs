@@ -14,9 +14,9 @@ pub enum UserCustomResponseError {
 
     #[error("Not Allowed")]
     NotAllowed,
-    
+
     #[error("Conflict")]
-    Conflict
+    Conflict,
 }
 
 #[derive(Debug, Error)]
@@ -31,7 +31,6 @@ pub enum CategoryCustomResponseError {
     NotAllowed,
 }
 
-
 impl ErrorExtensions for UserCustomResponseError {
     fn extend(&self) -> Error {
         Error::new(format!("{}", self)).extend_with(|_err, e| match self {
@@ -42,7 +41,6 @@ impl ErrorExtensions for UserCustomResponseError {
         })
     }
 }
-
 
 impl ErrorExtensions for CategoryCustomResponseError {
     fn extend(&self) -> Error {

@@ -33,9 +33,10 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
     println!("Playground: http://localhost:3000");
-    let port:u16= env::var("PORT")
-    .unwrap_or_else(|_| "3000".to_string())
-    .parse().expect("PORT must be a number");
+    let port: u16 = env::var("PORT")
+        .unwrap_or_else(|_| "3000".to_string())
+        .parse()
+        .expect("PORT must be a number");
 
     HttpServer::new(move || {
         App::new()
@@ -58,7 +59,7 @@ async fn main() -> std::io::Result<()> {
             // .service(download)
             .service(web::resource("/").guard(guard::Get()).to(gql_playgound))
     })
-    .bind(("0.0.0.0".to_string(),port))?
+    .bind(("0.0.0.0".to_string(), port))?
     .run()
     .await
 }
