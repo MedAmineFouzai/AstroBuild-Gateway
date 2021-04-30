@@ -36,6 +36,12 @@ pub struct PhoneInputModel {
     pub number: String,
 }
 
+#[derive(Debug, Serialize, SimpleObject, Deserialize, Clone)]
+pub struct CountryPrefixModel {
+    pub country:String,
+    pub prefix: String,
+}
+
 #[derive(Debug, Clone, SimpleObject, Deserialize, Serialize)]
 pub struct AddressModel {
     pub place: String,

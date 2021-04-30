@@ -1,22 +1,22 @@
 use crate::{controllers::schema::SendAccountModel, middleware::error::UserCustomResponseError};
 use actix_web::http::StatusCode;
 use async_graphql::ErrorExtensions;
+use crate::helper::get_static_country_code;
 use async_graphql::*;
 use reqwest::header;
 use std::env;
-// use serde_json::json;
-// use std::iter::FromIterator;
-// use std::io::Read;
 use load_dotenv::load_dotenv;
-
 mod schema;
 use schema::{
     AddressInputModel, AddressModel, AuthResponseModel, CategoryResponseModel, DeleteUserById,
     EmailModel, FeatureResponseModel, FeatureToAnyModel, PasswordInputModel, PasswordModel,
     PhoneInputModel, PhoneModel, Role, SerlizedId, SpecificationInput, TemplateModel,
     TemplateResponseModel, UpdateUserInfo, UpdateUserPassword, UserId, UserInfo, UserLoginModel,
-    UserModel, UserResponseModel,
+    UserModel, UserResponseModel,CountryPrefixModel
 };
+// use serde_json::json;
+// use std::iter::FromIterator;
+// use std::io::Read;
 
 load_dotenv!();
 #[derive(Debug)]
@@ -44,7 +44,7 @@ impl QueryRoot {
             .build()
             .unwrap();
         let res = client
-            .get(&format!("{}/api/v1/users/all", env!("BASE_URL")))
+            .get(&format!("{}/api/v1/users/all", env!("AUTH_URL")))
             .send()
             .await
             .unwrap();
@@ -85,7 +85,7 @@ impl QueryRoot {
             .unwrap();
         // let data = ;
         let res = client
-            .post(&format!("{}/api/v1/users/get", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/users/get", env!("AUTH_URL")))
             .json(&UserId { id: id })
             .send()
             .await
@@ -130,7 +130,7 @@ impl QueryRoot {
             .unwrap();
         // let data = ;
         let res = client
-            .post(&format!("{}/api/v1/builder/category/get", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/builder/category/get", env!("BUILDER_URL")))
             .json(&SerlizedId { id: id })
             .send()
             .await
@@ -173,7 +173,7 @@ impl QueryRoot {
             .unwrap();
         // let data = ;
         let res = client
-            .post(&format!("{}/api/v1/builder/feature/get", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/builder/feature/get", env!("BUILDER_URL")))
             .json(&SerlizedId { id: id })
             .send()
             .await
@@ -216,7 +216,7 @@ impl QueryRoot {
             .unwrap();
 
         let res = client
-            .post(&format!("{}/api/v1/builder/template/get", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/builder/template/get", env!("BUILDER_URL")))
             .json(&SerlizedId { id: id })
             .send()
             .await
@@ -238,6 +238,10 @@ impl QueryRoot {
         }
     }
 
+    
+
+
+
     async fn get_all_categories(
         &self,
         ctx: &Context<'_>,
@@ -257,7 +261,7 @@ impl QueryRoot {
             .build()
             .unwrap();
         let res = client
-            .get(&format!("{}/api/v1/builder/category/all", env!("BASE_URL")))
+            .get(&format!("{}/api/v1/builder/category/all", env!("BUILDER_URL")))
             .send()
             .await
             .unwrap();
@@ -290,7 +294,7 @@ impl QueryRoot {
             .build()
             .unwrap();
         let res = client
-            .get(&format!("{}/api/v1/builder/feature/all", env!("BASE_URL")))
+            .get(&format!("{}/api/v1/builder/feature/all", env!("BUILDER_URL")))
             .send()
             .await
             .unwrap();
@@ -326,7 +330,7 @@ impl QueryRoot {
             .build()
             .unwrap();
         let res = client
-            .get(&format!("{}/api/v1/builder/template/all", env!("BASE_URL")))
+            .get(&format!("{}/api/v1/builder/template/all", env!("BUILDER_URL")))
             .send()
             .await
             .unwrap();
@@ -343,6 +347,22 @@ impl QueryRoot {
         }
     }
 
+    async fn get_country_code(
+        &self,
+    ) -> FieldResult<Vec<CountryPrefixModel>> {
+        
+        Ok(
+            get_static_country_code().into_iter().map(|value|{
+                CountryPrefixModel {
+                    country:value.0.to_string(),
+                    prefix:value.1.to_string()
+                }
+            }
+        ).collect::<Vec<CountryPrefixModel>>()
+        )
+
+
+    }
     // async fn current_token<'a>(&self, ctx: &'a Context<'_>) -> Option<&'a str> {
     //     ctx.data_opt::<MyToken>().map(|token| token.0.as_str())
     // }
@@ -355,7 +375,7 @@ impl MutationRoot {
     async fn signup(&self, email: String, password: String) -> FieldResult<AuthResponseModel> {
         let client = reqwest::Client::new();
         let res = client
-            .post(&format!("{}/api/v1/users/auth/signup", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/users/auth/signup", env!("AUTH_URL")))
             .json(&UserModel {
                 email: email,
                 password: password,
@@ -417,7 +437,7 @@ impl MutationRoot {
         };
         let client = reqwest::Client::new();
         let res = client
-            .post(&format!("{}/api/v1/users/auth/signup", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/users/auth/signup", env!("AUTH_URL")))
             .json(&UserModel {
                 email: email,
                 password: password,
@@ -451,7 +471,7 @@ impl MutationRoot {
                 let res = client
                     .post(&format!(
                         "{}/api/v1/users/auth/send/account",
-                        env!("BASE_URL")
+                        env!("AUTH_URL")
                     ))
                     .json(email_model)
                     .send()
@@ -481,7 +501,7 @@ impl MutationRoot {
     async fn login(&self, email: String, password: String) -> FieldResult<AuthResponseModel> {
         let client = reqwest::Client::new();
         let res = client
-            .post(&format!("{}/api/v1/users/auth/login", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/users/auth/login", env!("AUTH_URL")))
             .json(&UserLoginModel {
                 email: email,
                 password: password,
@@ -529,7 +549,7 @@ impl MutationRoot {
             password: password,
         };
         let res = client
-            .delete(&format!("{}/api/v1/users/delete", env!("BASE_URL")))
+            .delete(&format!("{}/api/v1/users/delete", env!("AUTH_URL")))
             .json(&data)
             .send()
             .await
@@ -580,7 +600,7 @@ impl MutationRoot {
             .unwrap();
 
         let res = client
-            .put(&format!("{}/api/v1/users/update/info", env!("BASE_URL")))
+            .put(&format!("{}/api/v1/users/update/info", env!("AUTH_URL")))
             .json(&UpdateUserInfo {
                 id: id,
                 user_info: UserInfo {
@@ -602,6 +622,7 @@ impl MutationRoot {
             .send()
             .await
             .unwrap();
+            
         match res.status() {
             StatusCode::OK => {
                 let user: UserResponseModel = res.json::<UserResponseModel>().await.unwrap();
@@ -644,7 +665,7 @@ impl MutationRoot {
         let res = client
             .put(&format!(
                 "{}/api/v1/users/update/password",
-                env!("BASE_URL")
+                env!("AUTH_URL")
             ))
             .json(&UpdateUserPassword {
                 id: id,
@@ -682,7 +703,7 @@ impl MutationRoot {
         let client = reqwest::Client::new();
         // let data = ;
         let res = client
-            .post(&format!("{}/api/v1/users/auth/reset", env!("BASE_URL")))
+            .post(&format!("{}/api/v1/users/auth/reset", env!("AUTH_URL")))
             .json(&EmailModel { email: email })
             .send()
             .await
@@ -716,7 +737,7 @@ impl MutationRoot {
         let res = client
             .put(&format!(
                 "{}/api/v1/users/auth/reset/confirm",
-                env!("BASE_URL")
+                env!("AUTH_URL")
             ))
             .json(&UpdateUserPassword {
                 id: id,
@@ -770,7 +791,7 @@ impl MutationRoot {
         let res = client
             .delete(&format!(
                 "{}/api/v1/builder/category/delete",
-                env!("BASE_URL")
+                env!("BUILDER_URL")
             ))
             .json(&data)
             .send()
@@ -816,7 +837,7 @@ impl MutationRoot {
         let res = client
             .delete(&format!(
                 "{}/api/v1/builder/feature/delete",
-                env!("BASE_URL")
+                env!("BUILDER_URL")
             ))
             .json(&data)
             .send()
@@ -858,7 +879,7 @@ impl MutationRoot {
         let res = client
             .delete(&format!(
                 "{}/api/v1/builder/template/delete",
-                env!("BASE_URL")
+                env!("BUILDER_URL")
             ))
             .json(&data)
             .send()
@@ -880,7 +901,7 @@ impl MutationRoot {
         }
     }
 
-    async fn add_template_feature(
+    async fn update_template_feature(
         &self,
         ctx: &Context<'_>,
         id: String,
@@ -905,9 +926,9 @@ impl MutationRoot {
             features_id: features_id,
         };
         let res = client
-            .post(&format!(
-                "{}/api/v1/builder/template/feature/add",
-                env!("BASE_URL")
+            .put(&format!(
+                "{}/api/v1/builder/template/feature/update",
+                env!("BUILDER_URL")
             ))
             .json(&data)
             .send()
@@ -930,55 +951,55 @@ impl MutationRoot {
         }
     }
 
-    async fn delete_template_feature(
-        &self,
-        ctx: &Context<'_>,
-        id: String,
-        featuer_id: String,
-    ) -> FieldResult<TemplateResponseModel> {
-        let mut headers = header::HeaderMap::new();
-        headers.insert(
-            header::AUTHORIZATION,
-            header::HeaderValue::from_str(
-                &ctx.data_opt::<MyToken>()
-                    .map(|token| token.0.as_str())
-                    .unwrap_or("Authorization "),
-            )
-            .unwrap(),
-        );
-        let client = reqwest::Client::builder()
-            .default_headers(headers)
-            .build()
-            .unwrap();
-        let data: FeatureToAnyModel = FeatureToAnyModel {
-            id: id,
-            features_id: vec![featuer_id],
-        };
-        let res = client
-            .delete(&format!(
-                "{}/api/v1/builder/template/feature/delete",
-                env!("BASE_URL")
-            ))
-            .json(&data)
-            .send()
-            .await
-            .unwrap();
+    // async fn delete_template_feature(
+    //     &self,
+    //     ctx: &Context<'_>,
+    //     id: String,
+    //     featuer_id: String,
+    // ) -> FieldResult<TemplateResponseModel> {
+    //     let mut headers = header::HeaderMap::new();
+    //     headers.insert(
+    //         header::AUTHORIZATION,
+    //         header::HeaderValue::from_str(
+    //             &ctx.data_opt::<MyToken>()
+    //                 .map(|token| token.0.as_str())
+    //                 .unwrap_or("Authorization "),
+    //         )
+    //         .unwrap(),
+    //     );
+    //     let client = reqwest::Client::builder()
+    //         .default_headers(headers)
+    //         .build()
+    //         .unwrap();
+    //     let data: FeatureToAnyModel = FeatureToAnyModel {
+    //         id: id,
+    //         features_id: vec![featuer_id],
+    //     };
+    //     let res = client
+    //         .delete(&format!(
+    //             "{}/api/v1/builder/template/feature/delete",
+    //             env!("BASE_URL")
+    //         ))
+    //         .json(&data)
+    //         .send()
+    //         .await
+    //         .unwrap();
 
-        match res.status() {
-            StatusCode::OK => {
-                let template: TemplateResponseModel =
-                    res.json::<TemplateResponseModel>().await.unwrap();
-                Ok(template)
-            }
+    //     match res.status() {
+    //         StatusCode::OK => {
+    //             let template: TemplateResponseModel =
+    //                 res.json::<TemplateResponseModel>().await.unwrap();
+    //             Ok(template)
+    //         }
 
-            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
-                .extend_with(|_, e| e.set("info", "Category Dosent Existe To Delete !"))),
-            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
-                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
-            _ => Err(UserCustomResponseError::ServerError
-                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
-        }
-    }
+    //         StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+    //             .extend_with(|_, e| e.set("info", "Category Dosent Existe To Delete !"))),
+    //         StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
+    //             .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
+    //         _ => Err(UserCustomResponseError::ServerError
+    //             .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
+    //     }
+    // }
 
     async fn add_template_specification(
         &self,
@@ -1068,7 +1089,7 @@ impl MutationRoot {
         let res = client
             .put(&format!(
                 "{}/api/v1/builder/template/specification/add",
-                env!("BASE_URL")
+                env!("BUILDER_URL")
             ))
             .multipart(form)
             .send()

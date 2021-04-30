@@ -1,6 +1,7 @@
 extern crate env_logger;
 mod controllers;
 mod middleware;
+mod helper;
 use actix_cors::Cors;
 use actix_web::{guard, middleware as mid, web, App, HttpRequest, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig, MultipartOptions};
