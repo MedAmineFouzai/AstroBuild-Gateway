@@ -66,7 +66,7 @@ pub struct UserModel {
     pub last_name: String,
     pub phone: PhoneModel,
     pub address: AddressModel,
-    pub active: bool,
+
     pub role: String,
 }
 
@@ -78,7 +78,7 @@ pub struct UserResponseModel {
     pub last_name: String,
     pub phone: PhoneModel,
     pub address: AddressModel,
-    pub active: bool,
+
     pub role: String,
 }
 #[derive(Debug, Serialize, Deserialize)]

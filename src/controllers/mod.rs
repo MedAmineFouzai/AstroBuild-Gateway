@@ -391,7 +391,7 @@ impl MutationRoot {
                     zip: "".to_string(),
                     country: "".to_string(),
                 },
-                active: true,
+           
                 role: "Client".to_string(),
             })
             .send()
@@ -422,7 +422,7 @@ impl MutationRoot {
         last_name: String,
         phone: PhoneInputModel,
         address: AddressInputModel,
-        active: bool,
+        // active: bool,
         role: Role,
     ) -> FieldResult<UserResponseModel> {
         let email_model = &SendAccountModel {
@@ -453,7 +453,7 @@ impl MutationRoot {
                     zip: address.zip,
                     country: address.country,
                 },
-                active: active,
+             
                 role: match role {
                     Role::Admin => "Admin".to_string(),
                     Role::Client => "Client".to_string(),
