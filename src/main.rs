@@ -5,7 +5,7 @@ mod helper;
 use actix_cors::Cors;
 use actix_web::{guard, middleware as mid, web, App, HttpRequest, HttpResponse, HttpServer};
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig, MultipartOptions};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, Schema};
 use async_graphql_actix_web::{Request, Response};
 use controllers::{MutationRoot, MyToken, QueryRoot, UserSchema};
 use std::env;
@@ -33,7 +33,7 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription).finish();
-    println!("Playground: http://localhost:3000");
+    println!("🚀 Playground: http://localhost:3000");
     let port: u16 = env::var("PORT")
         .unwrap_or_else(|_| "3000".to_string())
         .parse()

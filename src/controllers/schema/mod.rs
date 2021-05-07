@@ -78,7 +78,6 @@ pub struct UserResponseModel {
     pub last_name: String,
     pub phone: PhoneModel,
     pub address: AddressModel,
-
     pub role: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
@@ -153,6 +152,24 @@ pub struct CategoryResponseModel {
     pub image: File,
 }
 
+#[derive(InputObject)]
+pub struct CategoryInputModel {
+    pub name: String,
+    pub description: String,
+    pub image: Upload,
+}
+
+#[derive(Debug,Deserialize,Serialize)]
+pub struct Category {
+    pub name: String,
+    pub description: String,
+    pub image: File,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CategoiresIds {
+    pub categories_id: Vec<String>,
+}
+
 #[derive(Debug, SimpleObject, Clone, Serialize, Deserialize)]
 pub struct File {
     pub name: String,
@@ -172,6 +189,34 @@ pub struct FeatureResponseModel {
     pub price: f64,
     pub repo: String,
 }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateFeatureWireframesModel {
+    pub id: String,
+    pub wireframes: Vec<FileWithOutOId>,
+}
+
+#[derive(Debug, Clone, SimpleObject, Serialize, Deserialize)]
+pub struct Feature {
+    pub name: String,
+    pub description: String,
+    pub feature_type: String,
+    pub image: File,
+    pub wireframes: Option<Vec<FileWithOutOId>>,
+    pub price: f64,
+    pub repo: String,
+}
+
+#[derive(InputObject)]
+pub struct FeatureInputModel{
+    pub name: String,
+    pub description: String,
+    pub feature_type: String,
+    pub image: Upload,
+    pub wireframes: Option<Vec<Upload>>,
+    pub price: f64,
+    pub repo: String,
+}
+
 #[derive(Debug, Clone, SimpleObject, Serialize, Deserialize)]
 pub struct FileWithOutOId {
     pub id: String,
@@ -201,6 +246,41 @@ pub struct TemplateModel {
     pub features: Option<Vec<String>>,
     pub image: File,
     pub specification: Option<Specification>,
+    // pub prototype_id: String,
+}
+
+#[derive(Debug, Serialize, SimpleObject, Deserialize)]
+pub struct Template {
+    pub name: String,
+    pub description: String,
+    pub category: String,
+    pub features: Option<Vec<String>>,
+    pub image: File,
+    pub specification: Option<Specification>,
+    // pub prototype_id: String,
+}
+
+#[derive(InputObject)]
+pub struct TemplateInputModel {
+
+    pub name: String,
+    pub description: String,
+    pub category: String,
+    // pub features: Option<Vec<String>>,
+    pub image: Upload,
+    // pub specification: Option<String>,
+    // pub prototype_id: String,
+}
+
+#[derive(InputObject)]
+pub struct TemplateUpdateInputModel {
+
+    pub name: String,
+    pub description: String,
+    pub category: String,
+    pub features: Option<Vec<String>>,
+    pub image: Upload,
+    pub specification: Option<String>,
     // pub prototype_id: String,
 }
 
@@ -282,4 +362,35 @@ pub struct NonFunctionalRequirementsInput {
     pub safety_requirements: String,
     pub security_requirements: String,
     pub software_quality_attributes: String,
+}
+
+impl Specification {
+    pub fn new() -> Specification {
+        Specification {
+            introduction: Introduction {
+                purpose: "".to_string(),
+                document_conventions: "".to_string(),
+                intended_audience: "".to_string(),
+                project_scope: "".to_string(),
+            },
+            overall_description: OverallDescription {
+                perspective: "".to_string(),
+                user_characteristics: "".to_string(),
+                operating_environment: "".to_string(),
+                design_implementation_constraints: "".to_string(),
+                user_documentation: "".to_string(),
+                assemptions_dependencies: "".to_string(),
+            },
+            non_functional_requirements: NonFunctionalRequirements {
+                performance_requirements: "".to_string(),
+                safety_requirements: "".to_string(),
+                security_requirements: "".to_string(),
+                software_quality_attributes: "".to_string(),
+            },
+            other_requirements: "".to_string(),
+            glossary: "".to_string(),
+            analysis_models: "".to_string(),
+            issues_list: "".to_string(),
+        }
+    }
 }
