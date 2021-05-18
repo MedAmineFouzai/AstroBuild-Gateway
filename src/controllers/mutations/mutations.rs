@@ -2,7 +2,7 @@ use crate::{
     controllers::schema::{Project, SendAccountModel, TemplateProtoType,  AddressOutput,  Category, CategoryInput, CategoryOutput,
         Connections,  DeleteUserById, EmailModel, Feature, FeatureInput,
         FeatureOutput, FeatureToAnyModel, File, FileWithOutOId, PasswordInput, PasswordModel,
-         PhoneOutput, ProtoType, Relations, Role, SerlizedId, SpecificationInput,
+         PhoneOutput, ProtoType, Relations, SerlizedId, SpecificationInput,
         SpecificationOutput, Template, TemplateDefactoredOutput, TemplateInput, TemplateOutput,
         TemplateProtoTypeInput, TemplateProtoTypeOutput, TemplateUpdateInput, UpdateFeatureWireframes,
         UpdateUserInfo, UpdateUserInput, UpdateUserPassword, UserAuthenticationOutput, 
@@ -73,12 +73,7 @@ impl MutationRoot {
         let email_model = &SendAccountModel {
             email: user.email.clone(),
             password: user.password.clone(),
-            role: match user.role {
-                Role::Admin => "Admin".to_string(),
-                Role::Client => "Client".to_string(),
-                Role::ProductOwner => "ProductOwner".to_string(),
-                Role::Developer => "Developer".to_string(),
-            },
+            role:user.role.clone(),
         };
         let client = reqwest::Client::new();
         let res = client
@@ -99,12 +94,7 @@ impl MutationRoot {
                     country: user.address.country,
                 },
 
-                role: match user.role {
-                    Role::Admin => "Admin".to_string(),
-                    Role::Client => "Client".to_string(),
-                    Role::ProductOwner => "ProductOwner".to_string(),
-                    Role::Developer => "Developer".to_string(),
-                },
+                role:user.role,
             })
             .send()
             .await

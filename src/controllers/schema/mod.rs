@@ -6,17 +6,17 @@ pub struct UserId {
     pub id: String,
 }
 
-#[derive(Enum, Copy, Clone, Eq, PartialEq)]
-pub enum Role {
-    #[graphql(name = "Admin")]
-    Admin,
-    #[graphql(name = "Client")]
-    Client,
-    #[graphql(name = "ProductOwner")]
-    ProductOwner,
-    #[graphql(name = "Developer")]
-    Developer,
-}
+// #[derive(Enum, Copy, Clone, Eq, PartialEq)]
+// pub enum Role {
+//     #[graphql(name = "Admin")]
+//     Admin,
+//     #[graphql(name = "Client")]
+//     Client,
+//     #[graphql(name = "ProductOwner")]
+//     ProductOwner,
+//     #[graphql(name = "Developer")]
+//     Developer,
+// }
 
 #[derive(Debug, Serialize, SimpleObject, Deserialize)]
 pub struct DeleteUserById {
@@ -88,7 +88,7 @@ pub struct UserInput {
     pub last_name: String,
     pub phone: PhoneInput,
     pub address: AddressInput,
-    pub role: Role,
+    pub role: String,
 }
 
 #[derive(InputObject)]
@@ -99,7 +99,7 @@ pub struct UpdateUserInput {
     pub last_name: String,
     pub phone: PhoneInput,
     pub address: AddressInput,
-    pub role: Role,
+    pub role: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
