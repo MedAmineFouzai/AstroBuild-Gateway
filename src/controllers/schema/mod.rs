@@ -25,7 +25,7 @@ pub struct DeleteUserById {
 }
 
 #[derive(Debug, Serialize, SimpleObject, Deserialize, Clone)]
-pub struct PhoneModel {
+pub struct PhoneOutput {
     pub prefix: String,
     pub number: String,
 }
@@ -43,7 +43,7 @@ pub struct CountryPrefixModel {
 }
 
 #[derive(Debug, Clone, SimpleObject, Deserialize, Serialize)]
-pub struct AddressModel {
+pub struct AddressOutput {
     pub place: String,
     pub city: String,
     pub zip: String,
@@ -64,8 +64,8 @@ pub struct UserModel {
     pub password: String,
     pub first_name: String,
     pub last_name: String,
-    pub phone: PhoneModel,
-    pub address: AddressModel,
+    pub phone: PhoneOutput,
+    pub address: AddressOutput,
     pub role: String,
 }
 
@@ -75,8 +75,8 @@ pub struct UserOutput {
     pub email: String,
     pub first_name: String,
     pub last_name: String,
-    pub phone: PhoneModel,
-    pub address: AddressModel,
+    pub phone: PhoneOutput,
+    pub address: AddressOutput,
     pub role: String,
 }
 
@@ -124,8 +124,8 @@ pub struct UserInfo {
     pub first_name: String,
     pub last_name: String,
     pub email: String,
-    pub phone: PhoneModel,
-    pub address: AddressModel,
+    pub phone: PhoneOutput,
+    pub address: AddressOutput,
 }
 
 #[derive(Debug, SimpleObject, Serialize, Deserialize)]

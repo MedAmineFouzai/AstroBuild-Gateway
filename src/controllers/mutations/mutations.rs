@@ -1,8 +1,8 @@
 use crate::{
-    controllers::schema::{Project, SendAccountModel, TemplateProtoType,  AddressModel,  Category, CategoryInput, CategoryOutput,
+    controllers::schema::{Project, SendAccountModel, TemplateProtoType,  AddressOutput,  Category, CategoryInput, CategoryOutput,
         Connections,  DeleteUserById, EmailModel, Feature, FeatureInput,
         FeatureOutput, FeatureToAnyModel, File, FileWithOutOId, PasswordInput, PasswordModel,
-         PhoneModel, ProtoType, Relations, Role, SerlizedId, SpecificationInput,
+         PhoneOutput, ProtoType, Relations, Role, SerlizedId, SpecificationInput,
         SpecificationOutput, Template, TemplateDefactoredOutput, TemplateInput, TemplateOutput,
         TemplateProtoTypeInput, TemplateProtoTypeOutput, TemplateUpdateInput, UpdateFeatureWireframes,
         UpdateUserInfo, UpdateUserInput, UpdateUserPassword, UserAuthenticationOutput, 
@@ -35,11 +35,11 @@ impl MutationRoot {
                 password: password,
                 first_name: "".to_string(),
                 last_name: "".to_string(),
-                phone: PhoneModel {
+                phone: PhoneOutput {
                     prefix: "".to_string(),
                     number: "".to_string(),
                 },
-                address: AddressModel {
+                address: AddressOutput {
                     place: "".to_string(),
                     city: "".to_string(),
                     zip: "".to_string(),
@@ -88,11 +88,11 @@ impl MutationRoot {
                 password: user.password,
                 first_name: user.first_name,
                 last_name: user.last_name,
-                phone: PhoneModel {
+                phone: PhoneOutput {
                     prefix: user.phone.prefix,
                     number: user.phone.number,
                 },
-                address: AddressModel {
+                address: AddressOutput {
                     place: user.address.place,
                     city: user.address.city,
                     zip: user.address.zip,
@@ -251,11 +251,11 @@ impl MutationRoot {
                     first_name: user.first_name,
                     last_name: user.last_name,
                     email: user.email,
-                    phone: PhoneModel {
+                    phone: PhoneOutput {
                         prefix: user.phone.prefix,
                         number: user.phone.number,
                     },
-                    address: AddressModel {
+                    address: AddressOutput {
                         place: user.address.place,
                         city: user.address.city,
                         zip: user.address.zip,
