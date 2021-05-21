@@ -373,43 +373,7 @@ impl QueryRoot {
         }
     }
 
-    async fn get_all_categories(&self, ctx: &Context<'_>) -> FieldResult<Vec<CategoryOutput>> {
-        let mut headers = header::HeaderMap::new();
-        headers.insert(
-            header::AUTHORIZATION,
-            header::HeaderValue::from_str(
-                &ctx.data_opt::<MyToken>()
-                    .map(|token| token.0.as_str())
-                    .unwrap_or("Authorization "),
-            )
-            .unwrap(),
-        );
-        let client = reqwest::Client::builder()
-            .default_headers(headers)
-            .build()
-            .unwrap();
-        let res = client
-            .get(&format!(
-                "{}/api/v1/builder/category/all",
-                env!("BUILDER_URL")
-            ))
-            .send()
-            .await
-            .unwrap();
-
-        match res.status() {
-            StatusCode::OK => Ok(res.json::<Vec<CategoryOutput>>().await.unwrap()),
-
-            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
-                .extend_with(|_, e| e.set("info", "Categories not Found !"))),
-            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
-                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
-            _ => Err(UserCustomResponseError::ServerError
-                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
-        }
-    }
-    
-     async fn get_all_projects(
+    async fn get_all_projects(
         &self,
         ctx: &Context<'_>,
     ) -> FieldResult<Vec<ProjectOutput>> {
@@ -446,6 +410,42 @@ impl QueryRoot {
 
             StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
                 .extend_with(|_, e| e.set("info", " Projects Not Found !"))),
+            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
+                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
+            _ => Err(UserCustomResponseError::ServerError
+                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
+        }
+    }
+
+    async fn get_all_categories(&self, ctx: &Context<'_>) -> FieldResult<Vec<CategoryOutput>> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert(
+            header::AUTHORIZATION,
+            header::HeaderValue::from_str(
+                &ctx.data_opt::<MyToken>()
+                    .map(|token| token.0.as_str())
+                    .unwrap_or("Authorization "),
+            )
+            .unwrap(),
+        );
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
+        let res = client
+            .get(&format!(
+                "{}/api/v1/builder/category/all",
+                env!("BUILDER_URL")
+            ))
+            .send()
+            .await
+            .unwrap();
+
+        match res.status() {
+            StatusCode::OK => Ok(res.json::<Vec<CategoryOutput>>().await.unwrap()),
+
+            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+                .extend_with(|_, e| e.set("info", "Categories not Found !"))),
             StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
                 .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
             _ => Err(UserCustomResponseError::ServerError
@@ -528,7 +528,7 @@ impl QueryRoot {
     async fn get_all_templates_by_categories_id(
         &self,
         ctx: &Context<'_>,
-        categoires: Vec<String>,
+        categories: Vec<String>,
     ) -> FieldResult<Vec<TemplateOutput>> {
         let mut headers = header::HeaderMap::new();
         headers.insert(
