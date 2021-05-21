@@ -546,7 +546,7 @@ impl QueryRoot {
             .unwrap();
 
         let data: CategoiresIds = CategoiresIds {
-            categories_id: categoires,
+            categories_id: categories,
         };
         let res = client
             .post(&format!(
