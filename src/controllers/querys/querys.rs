@@ -408,6 +408,50 @@ impl QueryRoot {
                 .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
         }
     }
+    
+     async fn get_all_projects(
+        &self,
+        ctx: &Context<'_>,
+    ) -> FieldResult<Vec<ProjectOutput>> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert(
+            header::AUTHORIZATION,
+            header::HeaderValue::from_str(
+                &ctx.data_opt::<MyToken>()
+                    .map(|token| token.0.as_str())
+                    .unwrap_or("Authorization "),
+            )
+            .unwrap(),
+        );
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
+     
+
+        let res = client
+            .get(&format!(
+                "{}/api/v1/builder/project/all",
+                env!("BUILDER_URL")
+            ))
+            .send()
+            .await
+            .unwrap();
+
+        match res.status() {
+            StatusCode::OK => {
+                let project: Vec<ProjectOutput> = res.json::<Vec<ProjectOutput>>().await.unwrap();
+                Ok(project)
+            }
+
+            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+                .extend_with(|_, e| e.set("info", " Projects Not Found !"))),
+            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
+                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
+            _ => Err(UserCustomResponseError::ServerError
+                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
+        }
+    }
 
     async fn get_all_features(&self, ctx: &Context<'_>) -> FieldResult<Vec<FeatureOutput>> {
         let mut headers = header::HeaderMap::new();
