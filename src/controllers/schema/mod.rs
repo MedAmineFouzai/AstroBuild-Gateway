@@ -293,7 +293,9 @@ pub struct TemplateInput {
     pub name: String,
     pub description: String,
     pub category: String,
+    pub features: Option<Vec<String>>,
     pub image: InputFile,
+    pub specification: Option<SpecificationInput>,
 }
 
 #[derive(InputObject)]
@@ -316,6 +318,38 @@ pub struct SpecificationOutput {
     pub analysis_models: String,
     pub issues_list: String,
 }
+
+impl SpecificationOutput {
+    pub fn build(specification:SpecificationInput)->SpecificationOutput{
+        SpecificationOutput {
+            introduction: IntroductionOutput{
+                purpose: specification.introduction.purpose,
+                document_conventions: specification.introduction.document_conventions,
+                intended_audience: specification.introduction.intended_audience,
+                project_scope: specification.introduction.project_scope,
+            },
+            overall_description: OverallDescriptionOutput{
+                perspective: specification.overall_description.perspective,
+                user_characteristics: specification.overall_description.user_characteristics,
+                operating_environment: specification.overall_description.operating_environment,
+                design_implementation_constraints: specification.overall_description.design_implementation_constraints,
+                user_documentation: specification.overall_description.user_documentation,
+                assemptions_dependencies: specification.overall_description.assemptions_dependencies,
+            },
+            non_functional_requirements: NonFunctionalRequirementsOutput{
+                performance_requirements: specification.non_functional_requirements.performance_requirements,
+                safety_requirements: specification.non_functional_requirements.safety_requirements,
+                security_requirements: specification.non_functional_requirements.security_requirements,
+                software_quality_attributes: specification.non_functional_requirements.software_quality_attributes,
+            },
+            other_requirements: specification.other_requirements,
+            glossary: specification.glossary,
+            analysis_models: specification.analysis_models,
+            issues_list: specification.issues_list,
+        }
+    }
+}
+
 
 #[derive(Debug, Clone, Serialize, SimpleObject, Deserialize)]
 pub struct IntroductionOutput {

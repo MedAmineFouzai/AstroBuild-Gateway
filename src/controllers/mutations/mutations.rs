@@ -530,7 +530,7 @@ impl MutationRoot {
         }
     }
 
-    async fn update_template_feature(
+    async fn update_template_features(
         &self,
         ctx: &Context<'_>,
         id: String,
@@ -1160,12 +1160,16 @@ impl MutationRoot {
             name: template.name,
             description: template.description,
             category: template.category,
-            features: Some(vec![]),
+            features: template.features,
             image: File {
                 name: template.image.name,
                 src: template.image.src,
             },
-            specification: Some(SpecificationOutput::new()),
+            specification:match template.specification {
+                Some(specification) => Some(SpecificationOutput::build(specification)),
+                None => Some(SpecificationOutput::new())
+            } 
+            ,
         };
 
         let res = client
