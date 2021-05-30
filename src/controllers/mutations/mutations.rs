@@ -1228,12 +1228,18 @@ impl MutationRoot {
             name: template.name,
             description: template.description,
             category: template.category,
-            features: Some(vec![]),
+            features:match template.features {
+                Some(featuers)=>Some(featuers),
+                None=>Some(vec![])
+            },
             image: File {
                 name: template.image.name,
                 src: template.image.src,
             },
-            specification: Some(SpecificationOutput::new()),
+            specification: match specification{
+                Some(specification)=>Some(SpecificationOutput::build(specification)),
+                None=>Some(SpecificationOutput::new())
+            },
         };
 
         let res = client
@@ -1248,13 +1254,14 @@ impl MutationRoot {
 
         match res.status() {
             StatusCode::OK => {
-                match specification {
-                    Some(specification) => {
-                        self.add_template_specification(ctx, id.clone(), specification)
-                            .await
-                    }
-                    None => Ok(res.json::<TemplateOutput>().await.unwrap()),
-                }
+                Ok(res.json::<TemplateOutput>().await.unwrap())
+                // match specification {
+                //     Some(specification) => {
+                //         self.add_template_specification(ctx, id.clone(), specification)
+                //             .await
+                //     }
+                //     None => Ok(res.json::<TemplateOutput>().await.unwrap()),
+                // }
                 // let template: TemplateResponseModel =
 
                 // Ok(template)

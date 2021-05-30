@@ -305,7 +305,7 @@ pub struct TemplateUpdateInput {
     pub category: String,
     pub features: Option<Vec<String>>,
     pub image: InputFile,
-    pub specification: Option<String>,
+  
 }
 
 #[derive(Debug, Clone, Serialize, SimpleObject, Deserialize)]
