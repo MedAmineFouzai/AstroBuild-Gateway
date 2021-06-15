@@ -584,7 +584,7 @@ pub enum State {
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct ProjectFullBuild {
     pub id: String,
-    pub full_build: String,
+    pub url: String,
 
 }
 
@@ -680,3 +680,26 @@ pub struct DelivrableInput {
     pub mvp: bool,
     pub design: bool,
 }
+
+
+#[derive(InputObject)]
+pub struct ProjectFileInput {
+    pub id:String,
+    pub name: String,
+    pub src: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectFile {
+    pub id:String,
+    pub name: String,
+    pub src: String,
+}
+
+#[derive(InputObject)]
+pub struct ProjectFullBuildInput {
+    pub id:String,
+    pub url: String,
+}
+
+

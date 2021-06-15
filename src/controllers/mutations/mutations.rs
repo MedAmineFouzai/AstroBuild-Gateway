@@ -8,7 +8,7 @@ use crate::{
         UpdateUserInfo, UpdateUserInput, UpdateUserPassword, UserAuthenticationOutput, 
         UserInfo, UserInput, UserLoginModel, UserModel, UserOutput, DelivrableOutput, DevtimeOutput, PaymentOptionOutput, ProjectFullBuild, ProjectInput,
         ProjectOutput, ProjectProposal, ProjectState, ProjectUpdateModel, ProposalInput,InputFile,
-        ProposalOutput, ResourceOutput, State},  MyToken,
+        ProposalOutput, ResourceOutput, State,ProjectFile,ProjectFileInput,ProjectFullBuildInput},  MyToken,
     middleware::error::UserCustomResponseError,
 };
 use actix_web::http::StatusCode;
@@ -1684,9 +1684,151 @@ impl MutationRoot {
         }
     }
 
-   
+    async fn add_project_mvp(
+        &self,
+        ctx: &Context<'_>,
+        mvp: ProjectFileInput,
+    ) -> FieldResult<ProjectOutput> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert(
+            header::AUTHORIZATION,
+            header::HeaderValue::from_str(
+                &ctx.data_opt::<MyToken>()
+                    .map(|token| token.0.as_str())
+                    .unwrap_or("Authorization "),
+            )
+            .unwrap(),
+        );
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
+        let data: ProjectFile=ProjectFile{
+            id:mvp.id,
+            name:mvp.name,
+            src:mvp.src
+        };
+
+        let res = client
+            .put(&format!(
+                "{}/api/v1/builder/project/mvp/add",
+                env!("BUILDER_URL")
+            ))
+            .json(&data)
+            .send()
+            .await
+            .unwrap();
+
+        match res.status() {
+            StatusCode::OK => {
+                let project: ProjectOutput = res.json::<ProjectOutput>().await.unwrap();
+                Ok(project)
+            }
+            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+                .extend_with(|_, e| e.set("info", "Project Not Found!"))),
+            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
+                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
+            _ => Err(UserCustomResponseError::ServerError
+                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
+        }
+    }
                
-         
+    async fn add_project_full_build(
+        &self,
+        ctx: &Context<'_>,
+        full_build: ProjectFullBuildInput,
+    ) -> FieldResult<ProjectOutput> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert(
+            header::AUTHORIZATION,
+            header::HeaderValue::from_str(
+                &ctx.data_opt::<MyToken>()
+                    .map(|token| token.0.as_str())
+                    .unwrap_or("Authorization "),
+            )
+            .unwrap(),
+        );
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
+        let data: ProjectFullBuild=ProjectFullBuild{
+            id: full_build.id,
+            url: full_build.url,
+        };
+
+        let res = client
+            .put(&format!(
+                "{}/api/v1/builder/project/full_build/add",
+                env!("BUILDER_URL")
+            ))
+            .json(&data)
+            .send()
+            .await
+            .unwrap();
+
+        match res.status() {
+            StatusCode::OK => {
+                let project: ProjectOutput = res.json::<ProjectOutput>().await.unwrap();
+                Ok(project)
+            }
+            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+                .extend_with(|_, e| e.set("info", "Project Not Found!"))),
+            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
+                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
+            _ => Err(UserCustomResponseError::ServerError
+                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
+        }
+    }
+
+      async fn add_project_design(
+        &self,
+        ctx: &Context<'_>,
+        design: ProjectFileInput,
+    ) -> FieldResult<ProjectOutput> {
+        let mut headers = header::HeaderMap::new();
+        headers.insert(
+            header::AUTHORIZATION,
+            header::HeaderValue::from_str(
+                &ctx.data_opt::<MyToken>()
+                    .map(|token| token.0.as_str())
+                    .unwrap_or("Authorization "),
+            )
+            .unwrap(),
+        );
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
+        let data: ProjectFile=ProjectFile{
+            id:design.id,
+            name:design.name,
+            src:design.src
+        };
+
+        let res = client
+            .put(&format!(
+                "{}/api/v1/builder/project/design/add",
+                env!("BUILDER_URL")
+            ))
+            .json(&data)
+            .send()
+            .await
+            .unwrap();
+
+        match res.status() {
+            StatusCode::OK => {
+                let project: ProjectOutput = res.json::<ProjectOutput>().await.unwrap();
+                Ok(project)
+            }
+            StatusCode::NOT_FOUND => Err(UserCustomResponseError::NotFound
+                .extend_with(|_, e| e.set("info", "Project Not Found!"))),
+            StatusCode::FORBIDDEN => Err(UserCustomResponseError::NotAllowed
+                .extend_with(|_, e| e.set("info", "Bad Authorization Header !"))),
+            _ => Err(UserCustomResponseError::ServerError
+                .extend_with(|_, e| e.set("info", "Somthing Wrong Happenend ! "))),
+        }
+    } 
            
         // match res.status() {
         //     StatusCode::OK => {
